@@ -40,26 +40,42 @@
         <!-- /.col -->
     </div>
     <!-- /.row -->
+    <div class="row">
+{{--    @auth('customer')--}}
+{{--        <div class="col-6" id="payment-method">--}}
+{{--            <p class="lead">Payment Methods:</p>--}}
+{{--            <img id="visa" src="{{ asset('images/credit/visa.png') }}" alt="Visa">--}}
+{{--            <img src="{{ asset('images/credit/mastercard.png') }}" alt="Mastercard">--}}
+{{--            <img src="{{ asset('images/credit/american-express.png') }}" alt="American Express">--}}
+{{--            <img src="{{ asset('images/credit/paypal2.png') }}" alt="Paypal">--}}
+{{--            <img id="vnpay" src="{{ asset('images/credit/vnpay2.jpg') }}" alt="Vnpay">--}}
+{{--            <div id="payment" style="margin-top: 2px;">--}}
 
-        <div class="col-12">
+{{--            </div>--}}
+{{--        </div>--}}
+{{--        <div class="col-6">--}}
+{{--    @endauth--}}
+{{--    @auth('employee')--}}
+    <div class="col-12">
+{{--    @endauth--}}
             <div class="table-responsive">
                 <table class="table">
                     <tbody>
                     <tr>
                         <th style="width:50%">Initial number:</th>
-                        <td>${initial_number}</td>
+                        <td>${data['bill']['initial_number']}</td>
                     </tr>
                     <tr>
                         <th style="width:50%">Final number:</th>
-                        <td>${final_number}</td>
+                        <td>${data['bill']['final_number']}</td>
                     </tr>
                     <tr>
                         <th>Price per number:</th>
-                        <td>${data['price']}</td>
+                        <td>${data['bill']['price_per_number']}</td>
                     </tr>
                     <tr>
                         <th>Total:</th>
-                        <td>${data['amount']}</td>
+                        <td>${data['bill']['amount']}₫</td>
                     </tr>
                     </tbody></table>
             </div>
@@ -72,7 +88,12 @@
     <div class="row no-print">
         <div class="col-12">
             <button type="button" class="btn btn-primary float-right" id="confirm">
+                @auth('employee')
                 <i class="fas fa-check"></i> Confirm
+                @endauth
+                @auth('customer')
+                <i class="fas fa-receipt"></i> Pay
+                @endauth
             </button>
         </div>
     </div>

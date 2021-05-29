@@ -93,13 +93,11 @@
                             <td>{{$bill['time']}}</td>
                             <td>{{$bill['from_date']}}</td>
                             <td>{{$bill['to_date']}}</td>
-                            <td>{{$bill['id']}}</td>
-                            <td>{{$bill['amount']}}</td>
+                            <td id="bill-id">{{$bill['id']}}</td>
+                            <td>{{$bill['amount']}}₫</td>
                             <td>{{$bill['status']}}</td>
                             <td>
-                                <button class="bill btn btn-info" data-toggle="modal"
-                                   data-target="#bill-modal" initial="{{$bill['initial_number']}}"
-                                   final="{{$bill['final_number']}}">Xem hoa don</button>
+                                <button class="bill btn btn-info" bill_id="{{$bill['id']}}">Xem hoa don</button>
                             </td>
                         </tr>
                         @endforeach
@@ -113,7 +111,7 @@
 <div class="modal fade" id="bill-modal">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header border-0">
                 <h4 class="modal-title" id="title"></h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
@@ -156,7 +154,9 @@
                             <td>${data['id']}</td>
                             <td>${data['amount']}</td>
                             <td>${data['status']}</td>
-                            <td><a href='#'>Xem hoa don</a></td>
+                            <td>
+                                <button class="bill btn btn-info" bill_id="${data['id']}">Xem hoa don</button>
+                            </td>
                             </tr>`
                             )
                         }
@@ -169,27 +169,55 @@
                 })
             });
 
-            $(".bill").click(function(){
+            $(document).on("click", ".bill",function(){
                 $("#bill-content").empty()
-                var customer_id = {{$customer['id']}};
-                var initial_number = $(this).attr("initial")
-                var final_number = $(this).attr("final")
+                var customer_id = "{{$customer['id']}}";
+                var bill_id = $(this).attr("bill_id")
                 $.ajax({
-                    url: '/get_customer_info',
+                    url: '/get_bill_info',
                     dataType: 'json',
                     // type: "POST",
                     data: {
                         'customer_id': customer_id,
-                        'initial_number': initial_number,
-                        'final_number': final_number
+                        'bill_id': bill_id
                     },
                     success: function(data) {
+                        // console.log(data)
                         date = new Date().toJSON().slice(0,10).replace(/-/g,'/');
                         // $("#title").text(title)
                         $('#bill-content').append(`@include('bill.bill')`)
+                        if (data['bill']['status'] == 1) {
+                            $(".no-print").empty()
+                            $("#payment-method").remove()
+                            $("#bill-list").removeClass()
+                            $("#bill-list").addClass("col-12")
+                        }
+                        $('#bill-modal').modal('show')
+                        $("#confirm").click(function () {
+                            $.ajax({
+                                type: "POST",
+                                url: 'bill/pay',
+                                data: {
+                                    "_token": "{{ csrf_token() }}",
+                                    'amount': data['bill']['amount']
+                                },
+                                success: function (d) {
+                                    console.log(d)
+                                    document.open()
+                                    document.write(d['html'])
+                                    document.close()
+                                }
+                            });
+                        });
                     }
                 });
+            });
+
+            $('#bill-content').on("click", "#vnpay",function() {
+                $("#payment").empty()
+                $("#payment").append(`@include('bill.vnpay_form')`)
             })
         })
+
     </script>
 @endsection

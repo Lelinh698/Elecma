@@ -134,31 +134,15 @@ class BillController extends Controller
                 'from_date' => date('d-m-Y', strtotime($bill['from_date'])),
                 'to_date' => date('d-m-Y', strtotime($bill['to_date'])),
                 'id' => $bill['id'],
-                'amount' => self::calculate($bill['consumption'])['amount'],
+                'amount' => $bill['amount'],
                 'status' => $bill['status'] ? 'Đã trả' : 'Chưa trả',
             ];
         }
         return Response(json_encode($data));
     }
 
-    public function getLastestBill($id) {
-//        $customer_id = $request['customer_id'];
-        $customer_id = $id;
-        $bill = Bill::where('customer_id', '=', $customer_id)->where('status', '=', Bill::UNPAID)->get();
-        $data = [];
-        if ($bill) {
-            $data = [
-                'from_date' => $bill['from_date'],
-                'to_date' => $bill['to_date'],
-                'id' => $bill['id'],
-                'amount' => $bill['consumption'],
-                'status' => $bill['status'] ? 'Đã trả' : 'Chưa trả',
-            ];
-        }
-        return Response(json_encode($data));
-    }
-
-    public static function calculate($consumption) {
+    public static function calculate($initial, $final) {
+        $consumption = $final - $initial;
         $elec_price = Electricity_price::where([
             ['from_number', '<=', $consumption], ['to_number', '>=', $consumption]])->first();
         $amount = (floor(($consumption * $elec_price['price'])/1000) + 1) *1000;
@@ -169,16 +153,102 @@ class BillController extends Controller
         return $data;
     }
 
-    public function pay() {
-        $customer_id = Auth::guard('customer')->id();
-        Bill::where([['customer_id', $customer_id],['status', Bill::UNPAID]])
-            ->update(['status' => Bill::PAID]);
-        return redirect()->intended(route('customer.index'));
+    public function pay(Request $request) {
+        $amount = $request->amount;
+        $returnHTML = view('vnpay.index')->with('amount', $amount)->render();
+        return response()->json(array('success' => true, 'html'=>$returnHTML));
     }
 
     public function update_electric_number() {
         return view('employees.update_enumber');
     }
 
+    public function getBillInfo(Request $request) {
+        if (Auth::guard('customer')->check()) {
+            $bill_id = $request->bill_id;
+            $bill = Bill::find($bill_id);
+            $customer = $bill->customer;
+            $department = $customer->department;
+            $data['department'] = $department;
+            $data['customer'] = $customer;
+            $data['bill'] = $bill;
+            return response()->json($data);
+        }
+    }
 
+    public function createPayment() {
+        session(['url_prev' => url()->previous()]);
+        $vnp_TxnRef = self::generateRandomString();
+        $vnp_OrderInfo = $_POST['order_desc'];
+        $vnp_OrderType = $_POST['order_type'];
+        $vnp_Amount = $_POST['amount'] * 100;
+        $vnp_Locale = $_POST['language'];
+        $vnp_BankCode = $_POST['bank_code'];
+        $vnp_IpAddr = $_SERVER['REMOTE_ADDR'];
+
+        $inputData = array(
+            "vnp_Version" => "2.0.0",
+            "vnp_TmnCode" => env('VNP_TMN_CODE'),
+            "vnp_Amount" => $vnp_Amount,
+            "vnp_Command" => "pay",
+            "vnp_CreateDate" => date('YmdHis'),
+            "vnp_CurrCode" => "VND",
+            "vnp_IpAddr" => $vnp_IpAddr,
+            "vnp_Locale" => $vnp_Locale,
+            "vnp_OrderInfo" => $vnp_OrderInfo,
+            "vnp_OrderType" => $vnp_OrderType,
+            "vnp_ReturnUrl" => route('vnpay.return'),
+            "vnp_TxnRef" => $vnp_TxnRef,
+        );
+
+        if (isset($vnp_BankCode) && $vnp_BankCode != "") {
+            $inputData['vnp_BankCode'] = $vnp_BankCode;
+        }
+        ksort($inputData);
+        $query = "";
+        $i = 0;
+        $hashdata = "";
+        foreach ($inputData as $key => $value) {
+            if ($i == 1) {
+                $hashdata .= '&' . $key . "=" . $value;
+            } else {
+                $hashdata .= $key . "=" . $value;
+                $i = 1;
+            }
+            $query .= urlencode($key) . "=" . urlencode($value) . '&';
+        }
+
+        $vnp_Url = env('VNP_URL') . "?" . $query;
+        $vnp_HashSecret = env('VNP_HASH_SECRET');
+        if (isset($vnp_HashSecret)) {
+            // $vnpSecureHash = md5($vnp_HashSecret . $hashdata);
+            $vnpSecureHash = hash('sha256', $vnp_HashSecret . $hashdata);
+            $vnp_Url .= 'vnp_SecureHashType=SHA256&vnp_SecureHash=' . $vnpSecureHash;
+        }
+        $returnData = array('code' => '00'
+        , 'message' => 'success'
+        , 'data' => $vnp_Url);
+//        echo json_encode($returnData);
+        return redirect($vnp_Url);
+    }
+
+    public function vnpayReturn(Request $request) {
+        $url = session('url_prev','/');
+        if($request->vnp_ResponseCode == "00") {
+            $this->apSer->thanhtoanonline(session('cost_id'));
+            return redirect($url)->with('success' ,'Đã thanh toán phí dịch vụ');
+        }
+        session()->forget('url_prev');
+        return redirect($url)->with('errors' ,'Lỗi trong quá trình thanh toán phí dịch vụ');
+    }
+
+    public static function generateRandomString($length = 10) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
+    }
 }

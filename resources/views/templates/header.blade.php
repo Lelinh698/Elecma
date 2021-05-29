@@ -55,7 +55,7 @@
                         <a href="/update_electric_number" class="nav-link">Cập nhật số điện</a>
                     </li>
                     <li class="nav-item d-none d-sm-inline-block">
-                        <a href="#" class="nav-link">Phát hiện bất thường</a>
+                        <a href="abnormal" class="nav-link">Phát hiện bất thường</a>
                     </li>
                     <li class="nav-item d-none d-sm-inline-block">
                         <a href="#" class="nav-link">Thống kê</a>

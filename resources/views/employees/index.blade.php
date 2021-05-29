@@ -102,7 +102,7 @@
                             <td>{{$bill['to_date']}}</td>
                             <td>{{$bill['id']}}</td>
                             <td>{{$bill['customer']}}</td>
-                            <td>{{$bill['amount']}}</td>
+                            <td>{{$bill['amount']}}₫</td>
                             <td>{{$bill['status']}}</td>
                             <td><a href="/bill">Xem hoa don</a></td>
                         </tr>

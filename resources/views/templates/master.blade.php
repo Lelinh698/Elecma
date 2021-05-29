@@ -6,8 +6,7 @@
     <title> @yield('title')</title>
     <link rel="stylesheet" href="{{ asset('fontawesome/css/all.min.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ asset('css/adminlte.min.css') }}" type="text/css">
-{{--    <link href="{{ asset('css/bootstrap.min.css') }}" type="text/css" rel="stylesheet" />--}}
-	<link href="{{ asset('css/dataTables.bootstrap.min.css') }}" type="text/css" rel="stylesheet" />
+	<!-- <link href="{{ asset('css/dataTables.bootstrap.min.css') }}" type="text/css" rel="stylesheet" /> -->
     <link href="{{ asset('css/Chart.min.css') }}" type="text/css" rel="stylesheet" />
 	<link href="{{ asset('css/style.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet" />
@@ -36,9 +35,10 @@
     </div>
 
 	<script type="text/javascript" src="{!! url('js/jquery.min.js') !!}"></script>
-	<script type="text/javascript" src="{!! url('js/bootstrap.min.js') !!}"></script>
-	<script type="text/javascript" src="{!! url('js/jquery.dataTables.min.js') !!}"></script>
-	<script type="text/javascript" src="{!! url('js/dataTables.bootstrap.min.js') !!}"></script>
+	<script type="text/javascript" src="{!! url('js/bootstrap.bundle.min.js') !!}"></script>
+	<script type="text/javascript" src="{!! url('js/adminlte.min.js') !!}"></script>
+	<!-- <script type="text/javascript" src="{!! url('js/jquery.dataTables.min.js') !!}"></script>
+	<script type="text/javascript" src="{!! url('js/dataTables.bootstrap.min.js') !!}"></script> -->
     <script type="text/javascript" src="{!! url('js/Chart.min.js') !!}"></script>
     <script type="text/javascript" src="{!! url('js/main.js') !!}"></script>
     <script type="text/javascript">window.onload = date_time('date_time');</script>

@@ -27,7 +27,7 @@ class CustomerController extends Controller
                         'from_date' => date('d-m-Y', strtotime($bill['from_date'])),
                         'to_date' => date('d-m-Y', strtotime($bill['to_date'])),
                         'id' => $bill['id'],
-                        'amount' => BillController::calculate($bill['consumption'])['amount'],
+                        'amount' => $bill['amount'],
                         'status' => $bill['status'] ? 'Đã trả' : 'Chưa trả',
                     ];
                     array_push($data, $temp);
@@ -142,11 +142,15 @@ class CustomerController extends Controller
             $final_number = $request->final_number;
             $customer = Customer::find($customer_id);
             $department = $customer->department;
-            $bill = BillController::calculate($final_number - $initial_number);
+            $bill = BillController::calculate($initial_number, $final_number);
             $data['department'] = $department;
             $data['customer'] = $customer;
-            $data['amount'] = $bill['amount'];
-            $data['price'] = $bill['price'];
+            $data['bill'] = [
+                'amount' => $bill['amount'],
+                'price_per_number' => $bill['price_per_number'],
+                'initial_number' => $initial_number,
+                'final_number' => $final_number
+            ];
 
             return response()->json($data);
         }
