@@ -38,4 +38,5 @@ Route::get('get_customer_info', 'CustomerController@getCustomerInfo');
 Route::get('get_bill_info', 'BillController@getBillInfo');
 //Route::post('update_bill', 'BillController@store');
 Route::get('get_bill_info', 'BillController@getBillInfo');
-Route::get('abnormal', 'MeterController@abnormal_electricity');
+Route::get('abnormal/{month}', 'MeterController@abnormal_electricity');
+Route::get('abnormal/{customer_id}/{year}/{month}', 'MeterController@getCustomerMeterDetail');

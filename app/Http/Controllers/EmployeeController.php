@@ -27,7 +27,7 @@ class EmployeeController extends Controller
                         'to_date' => date('d-m-Y', strtotime($bill['to_date'])),
                         'id' => $bill['id'],
                         'customer' => Customer::where('id', $bill['customer_id'])->first()->username,
-                        'amount' => $bill['consumption'],
+                        'amount' => $bill['amount'],
                         'status' => $bill['status'] ? 'Đã trả' : 'Chưa trả',
                     ];
                     array_push($data, $temp);
