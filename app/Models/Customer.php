@@ -19,7 +19,7 @@ class Customer extends Authenticatable
     }
 
     public function meter() {
-        return $this->hasMany('App\Models\Meter');
+        return $this->hasOne('App\Models\Meter');
     }
 
     public function bills() {

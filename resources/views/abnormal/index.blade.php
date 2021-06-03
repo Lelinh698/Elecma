@@ -13,7 +13,7 @@
                     <div class="card-tools">
                         <form class="form-inline ml-3">
                             <div class="input-group input-group-sm">
-                                <select name="month" id="month" class="form-control float-right">
+                                <select name="month" id="month" class="form-control float-right" title="Tháng">
                                     <option value="1">Tháng 1</option>
                                     <option value="2">Tháng 2</option>
                                     <option value="3">Tháng 3</option>
@@ -26,6 +26,11 @@
                                     <option value="10">Tháng 10</option>
                                     <option value="11">Tháng 11</option>
                                     <option value="12">Tháng 12</option>
+                                </select>
+                                <select name="year" id="year" class="form-control float-right" title="Năm">
+                                    <option value="2021">2021</option>
+                                    <option value="2020">2020</option>
+                                    <option value="2019">2019</option>
                                 </select>
                                 <div class="input-group-append">
                                     <button class="btn btn-navbar" type="submit">
