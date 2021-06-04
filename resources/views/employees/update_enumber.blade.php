@@ -29,6 +29,8 @@
                             <select id="customer" name="customer" class="select2 col-sm-10">
                             </select>
                         </div>
+                        <div class="row" id="previous-row">
+                        </div>
                         <div class="form-group row">
                             <label for="initial-number" class="col-sm-2 control-label">Initial number</label>
                             <input id="initial-number" name="initial-number" type="number" min="0" required class="col-sm-4">
@@ -45,22 +47,6 @@
     <div id="bill">
 
     </div>
-
-{{--    <div class="modal fade" id="bill-modal" style="display: none;" aria-hidden="true">--}}
-{{--        <div class="modal-dialog modal-lg">--}}
-{{--            <div class="modal-content">--}}
-{{--                <div class="modal-header">--}}
-{{--                    <h4 class="modal-title" id="title"></h4>--}}
-{{--                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">--}}
-{{--                        <span aria-hidden="true">×</span>--}}
-{{--                    </button>--}}
-{{--                </div>--}}
-{{--                <div class="modal-body">--}}
-{{--                    --}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        </div>--}}
-{{--    </div>--}}
 @endsection
 
 @section('js')
@@ -70,6 +56,11 @@
             $('.select2').select2({
 
             });
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
 
             $.ajax({
                 url: '/get_customer_list',
@@ -77,10 +68,31 @@
                 success: function(data) {
                     $( "select[name='customer']").empty();
                     $.each(data, function(key, value) {
-                        $("select[name='customer']").append('<option value="'+ key +'">'+ value +'</option>');
+                        $("select[name='customer']").append(
+                            '<option value="'+ key +'">'+ value['username'] +" - "+ value['name'] +'</option>'
+                        );
                     });
                 }
             });
+
+            $( "select[name='customer']").on("change", function() {
+                const  customer_id = $( "select[name='customer']").val()
+                console.log(customer_id)
+                $.ajax({
+                    url: '/get_latest_number',
+                    dataType: 'json',
+                    type: 'POST',
+                    data: {
+                        "customer_id": customer_id
+                    },
+                    success: function(data) {
+                        console.log(data)
+                        $("#previous-row").html(
+                            '<label>Previous number: </label><span id="previous-number"></span>'
+                        )
+                    }
+                });
+            })
 
             $( "#submit" ).click(function (e) {
                 e.preventDefault()

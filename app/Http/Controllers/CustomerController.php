@@ -121,14 +121,42 @@ class CustomerController extends Controller
         return redirect('/customers')->with('success', 'Customer deleted!');
     }
 
+    public function getCustomerListView() {
+        if (Auth::guard('employee')->check()) {
+            $data = [];
+            $department_id = Auth::guard('employee')->user()->id;
+
+            $customers = Customer::where('department_id', $department_id)->get();
+
+            foreach ($customers as $customer) {
+                $data[$customer->id] = [
+                    'id' => $customer->id,
+                    'username' => $customer->username,
+                    'name' => $customer->name,
+                    'email' => $customer->email,
+                    'phone' => $customer->phone,
+                    'address' => $customer->address
+                ];
+            }
+
+            return view('employees.customer_list')->with('customers',$data);
+        }
+    }
+
     public function getCustomerList() {
         if (Auth::guard('employee')->check()) {
             $data = [];
+            $department_id = Auth::guard('employee')->user()->id;
 
-            $customers = Customer::select('id', 'username')->get();
+            $customers = Customer::select('id', 'username', 'name')
+                        ->where('department_id', $department_id)->get();
 
             foreach ($customers as $customer) {
-                $data[$customer->id] = $customer->id . " - " . $customer->username;
+                $data[$customer->id] = [
+                    'id' => $customer->id,
+                    'username' => $customer->username,
+                    'name' => $customer->name
+                ];
             }
 
             return response()->json($data);

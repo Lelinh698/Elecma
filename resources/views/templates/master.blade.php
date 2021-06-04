@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title> @yield('title')</title>
     <link rel="stylesheet" href="{{ asset('fontawesome/css/all.min.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ asset('css/adminlte.min.css') }}" type="text/css">
@@ -12,7 +13,7 @@
     <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet" />
 
 </head>
-<body class="layout-top-nav">
+<body class="hold-transition layout-top-nav">
     <div class="wrapper">
         <div class="container">
             @include('templates.header')

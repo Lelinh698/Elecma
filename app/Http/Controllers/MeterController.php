@@ -27,12 +27,25 @@ class MeterController extends Controller
             $list_number = [];
             $customer = Customer::find($customer_id);
             if ($customer) {
-                $meter = $customer->meter->find(1);
-                $list_number = $meter->meter_reading->where('year', '=', $year)->pluck(['number']);
+                $list_number = $customer->meter->meter_reading->where('year', '=', $year)->pluck(['number']);
             }
             $data = [
                 'numbers' => $list_number,
                 'year' => $year
+            ];
+            return Response(json_encode($data));
+        }
+    }
+
+    public function get_latest_number(Request $request) {
+        if (Auth::guard('employee')->check()) {
+            $customer_id = $request->customer_id;
+            $customer = Customer::find($customer_id);
+            $latest_number = $customer->meter->meter_reading->last();
+            $data = [
+                'number' => $latest_number->number,
+                'month' => $latest_number->month,
+                'year' => $latest_number->year
             ];
             return Response(json_encode($data));
         }
@@ -50,12 +63,10 @@ class MeterController extends Controller
                 'name' => $customer->name,
                 'address' => $customer->address,
             ];
-            $current = $previous['number'] = $month = [];
+            $current['number'] = $previous['number'] = $month = [];
             foreach ($number_model->take(-12)->all() as $data) {
                 array_push($month, $data->month);
-                array_push($current, [
-                    'number' => $data->number
-                ]);
+                array_push($current['number'], $data->number);
                 array_push($previous['number'],
                      $number_model->where('year', $data->year-1)
                          ->where('month', $data->month)->first()->number);
