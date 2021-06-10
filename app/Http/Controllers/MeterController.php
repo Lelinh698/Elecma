@@ -88,6 +88,7 @@ class MeterController extends Controller
             $group_weight = 2;
             $data = $this->get_tendency($previous_year);
 
+//            var_dump($data);
             $topsis = $final = $denominator = [];
             $denominator[$month] = [
                 'year' => 0,
@@ -114,6 +115,8 @@ class MeterController extends Controller
                     number_format($data[$month][$customer]['group'] * $group_weight
                         / $denominator[$month]['group'],4);
             }
+
+//            var_dump($topsis);
 
             $min = $max = [];
 
@@ -143,6 +146,7 @@ class MeterController extends Controller
                 $distance[$month][$customer]['C'] = $distance[$month][$customer]['bad']
                             / ($distance[$month][$customer]['bad'] + $distance[$month][$customer]['good']);
             }
+//            var_dump($distance);
 
             foreach (array_keys($data[$month]) as $customer) {
                 $customer_id = explode('_',$customer)[1];

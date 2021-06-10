@@ -25,17 +25,23 @@
                 <div class="card-body">
                     <form class="form-horizontal" id="update-form">
                         <div class="form-group row">
-                            <label for="customer" class="col-sm-2 control-label">Customer</label>
+                            <label for="customer" class="col-sm-2 control-label">Khách hàng</label>
                             <select id="customer" name="customer" class="select2 col-sm-10">
                             </select>
                         </div>
-                        <div class="row" id="previous-row">
+                        <div class="row form-group" id="previous-row">
                         </div>
                         <div class="form-group row">
-                            <label for="initial-number" class="col-sm-2 control-label">Initial number</label>
+                            <label for="initial-number" class="col-sm-2 control-label">Số điện đầu</label>
                             <input id="initial-number" name="initial-number" type="number" min="0" required class="col-sm-4">
-                            <label for="final-number" class="col-sm-2 control-label">Final number</label>
+                            <label for="final-number" class="col-sm-2 control-label">Số điện cuối</label>
                             <input id="final-number" name="final-number" type="number" min="0" required class="col-sm-4">
+                        </div>
+                        <div class="form-group row">
+                            <label for="from_date" class="col-sm-2 control-label">Từ ngày</label>
+                            <input id="from_date" name="from_date" type="date" required class="col-sm-4">
+                            <label for="to_date" class="col-sm-2 control-label">Đến ngày</label>
+                            <input id="to_date" name="to_date" type="date" required class="col-sm-4">
                         </div>
                         <button id="submit" type="submit" class="btn btn-primary">Cập nhật</button>
                     </form>
@@ -77,7 +83,7 @@
 
             $( "select[name='customer']").on("change", function() {
                 const  customer_id = $( "select[name='customer']").val()
-                console.log(customer_id)
+                // console.log(customer_id)
                 $.ajax({
                     url: '/get_latest_number',
                     dataType: 'json',
@@ -86,9 +92,9 @@
                         "customer_id": customer_id
                     },
                     success: function(data) {
-                        console.log(data)
+                        // console.log(data)
                         $("#previous-row").html(
-                            '<label>Previous number: </label><span id="previous-number"></span>'
+                            "<label>Số điện tháng trước:</label>" + " " + data['number']
                         )
                     }
                 });
@@ -109,10 +115,13 @@
                         data: {
                             'customer_id': customer_id,
                             'initial_number': initial_number,
-                            'final_number': final_number
+                            'final_number': final_number,
+                            'from_date': $('#from_date').val(),
+                            'to_date': $('#to_date').val()
                         },
                         success: function(data) {
                             date = new Date().toJSON().slice(0,10).replace(/-/g,'/');
+                            console.log(data['bill']['amount'])
                             $('#bill').append(`@include('bill.bill')`)
                             $('#confirm').click(function (e) {
                                 e.preventDefault()
@@ -129,6 +138,10 @@
                                         'customer_id': customer_id,
                                         'initial_number': initial_number,
                                         'final_number': final_number,
+                                        'from_date': $('#from_date').val(),
+                                        'to_date': $('#to_date').val(),
+                                        'amount': data['bill']['amount'],
+                                        'price_per_number': data['bill']['price_per_number'],
                                         'status': 0
                                     },
                                     success: function(data) {

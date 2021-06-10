@@ -1,4 +1,4 @@
-@extends('templates.master')
+@extends('admin.base')
 
 @section('title','Trang chu')
 
@@ -18,7 +18,9 @@
                             <th>Họ tên</th>
                             <th>Email</th>
                             <th>Số điện thoại</th>
-                            <th>Địa chỉ</th>
+                            <th>Chi nhánh</th>
+{{--                            <th style="width: 20%;">Địa chỉ</th>--}}
+                            <th></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -29,7 +31,18 @@
                                 <td>{{$customer['name']}}</td>
                                 <td>{{$customer['email']}}</td>
                                 <td>{{$customer['phone']}}₫</td>
-                                <td>{{$customer['address']}}</td>
+                                <td>{{$customer['department']['name']}}</td>
+{{--                                <td>{{$customer['address']}}</td>--}}
+                                <td class="project-actions text-right">
+                                    <a class="btn btn-info btn-sm" href="#">
+                                        <i class="fas fa-pencil-alt">
+                                        </i>
+                                    </a>
+                                    <a class="btn btn-danger btn-sm" href="#">
+                                        <i class="fas fa-trash">
+                                        </i>
+                                    </a>
+                                </td>
                             </tr>
                         @endforeach
                         </tbody>

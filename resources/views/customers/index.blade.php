@@ -196,7 +196,7 @@
                         $("#confirm").click(function () {
                             $.ajax({
                                 type: "POST",
-                                url: 'bill/pay',
+                                url: '/customer/bill/pay',
                                 data: {
                                     "_token": "{{ csrf_token() }}",
                                     'amount': data['bill']['amount']

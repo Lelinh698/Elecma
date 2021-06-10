@@ -16,8 +16,8 @@
             <address>
                 <strong>${data['department']['name']}</strong><br>
                 ${data['department']['address']}<br>
-                Phone: (804) 123-5432<br>
-                Email: info@almasaeedstudio.com
+{{--                Phone: (804) 123-5432<br>--}}
+{{--                Email: info@almasaeedstudio.com--}}
             </address>
         </div>
         <!-- /.col -->
@@ -34,7 +34,7 @@
         <div class="col-sm-4 invoice-col">
             <b>Bill ID #007612</b><br>
             <br>
-            <b>Payment Due:</b> 2/22/2014<br>
+{{--            <b>Payment Due:</b> 2/22/2014<br>--}}
             <b>Account:</b> ${data['customer']['username']}
         </div>
         <!-- /.col -->
@@ -62,19 +62,27 @@
                 <table class="table">
                     <tbody>
                     <tr>
-                        <th style="width:50%">Initial number:</th>
+                        <th style="width:50%">Chỉ số đầu:</th>
                         <td>${data['bill']['initial_number']}</td>
                     </tr>
                     <tr>
-                        <th style="width:50%">Final number:</th>
+                        <th style="width:50%">Chỉ số cuối:</th>
                         <td>${data['bill']['final_number']}</td>
                     </tr>
                     <tr>
-                        <th>Price per number:</th>
-                        <td>${data['bill']['price_per_number']}</td>
+                        <th style="width:50%">Từ ngày:</th>
+                        <td>${data['bill']['from_date']}</td>
                     </tr>
                     <tr>
-                        <th>Total:</th>
+                        <th style="width:50%">Đến ngày:</th>
+                        <td>${data['bill']['to_date']}</td>
+                    </tr>
+                    <tr>
+                        <th>Giá tiền mỗi số:</th>
+                        <td>${data['bill']['price_per_number']}₫</td>
+                    </tr>
+                    <tr>
+                        <th>Tổng tiền:</th>
                         <td>${data['bill']['amount']}₫</td>
                     </tr>
                     </tbody></table>

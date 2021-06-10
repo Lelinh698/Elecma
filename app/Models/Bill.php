@@ -14,7 +14,7 @@ class Bill extends Model
     const UNPAID = 0;
 
     protected $fillable = [
-        'consumption', 'from_date', 'to_date', 'paid_date', 
+        'amount', 'from_date', 'to_date', 'paid_date',
         'paid_mode', 'status', 'customer_id', 'initial_number',
         'final_number', 'price_per_number'
     ];

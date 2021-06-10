@@ -16,12 +16,10 @@
         @auth('customer')
             <p class="text-md">Lien he: 0788399319</p>
             <p class="text-md">Xin chao: {{ auth('customer')->user()->username }}</p>
-            <a href="/logout">Logout</a>
         @endauth
         @auth('employee')
             <p class="text-md">Lien he: 0788399319</p>
             <p class="text-md">Xin chao: {{ auth('employee')->user()->username }}</p>
-            <a href="/logout">Logout</a>
         @endauth
         </div>
     </div>
@@ -62,11 +60,14 @@
                             Quản lý
                         </a>
                         <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
-                            <li><a href="#" class="dropdown-item">Xem danh sách khách hàng</a></li>
-                            <li><a href="#" class="dropdown-item">Thống kê</a></li>
+                            <li><a href="/view_list_customer" class="dropdown-item">Xem danh sách khách hàng</a></li>
+                            <li><a href="/statistic" class="dropdown-item">Thống kê</a></li>
                         </ul>
                     </li>
                 @endauth
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a href="/logout" class="nav-link">Đăng xuất</a>
+                </li>
             </ul>
         </div>
     </nav>

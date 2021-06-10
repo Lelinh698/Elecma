@@ -7,6 +7,10 @@ use App\Models\Customer;
 
 class RegisterController extends Controller
 {
+    public function getRegister() {
+        return view('auth.registration');
+    }
+
     protected function validator(array $data)
     {
         return Validator::make($data, [

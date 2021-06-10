@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Bill;
 use App\Models\Customer;
 use App\Models\Electricity_price;
+use App\Models\Meter_reading;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -42,8 +43,12 @@ class BillController extends Controller
         $customer_id = $request->customer_id;
         $initial_number = $request->initial_number;
         $final_number = $request->final_number;
-        $from_date = date('Y-m-d H:i:s');
-        $to_date = date('Y-m-d H:i:s', strtotime($from_date . ' +10 day'));
+        $price_per_number = $request->price_per_number;
+        $amount = $request->amount;
+//        $from_date = date('Y-m-d H:i:s');
+//        $to_date = date('Y-m-d H:i:s', strtotime($from_date . ' +10 day'));
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
         $status = $request->status;
 
         $request->validate([
@@ -58,12 +63,22 @@ class BillController extends Controller
             ['id' => $id],
             [
                 'customer_id'  => $customer_id,
-                'consumption' => $final_number - $initial_number,
+                'initial_number' => $initial_number,
+                'final_number' => $final_number,
+                'price_per_number' => $price_per_number,
+                'amount' => $amount,
                 'from_date' => $from_date,
                 'to_date' => $to_date,
                 'status' => $status,
             ]);
-        return Response(json_encode(['status'=> 'success']));
+        Meter_reading::create([
+            'meter_id' => Customer::find($customer_id)->meter->id,
+            'number' => $final_number - $initial_number,
+            'month' => date('m', $to_date),
+            'year' => date('Y', $to_date),
+        ]);
+
+        return redirect()->route('update_electric_number', ['status' => 'Cập nhật thành công']);
     }
 
     /**
@@ -147,7 +162,7 @@ class BillController extends Controller
             ['from_number', '<=', $consumption], ['to_number', '>=', $consumption]])->first();
         $amount = (floor(($consumption * $elec_price['price'])/1000) + 1) *1000;
         $data = [
-            'price' => $elec_price['price'],
+            'price_per_number' => $elec_price['price'],
             'amount' => $amount
         ];
         return $data;
@@ -166,6 +181,7 @@ class BillController extends Controller
     public function getBillInfo(Request $request) {
         if (Auth::guard('customer')->check()) {
             $bill_id = $request->bill_id;
+            session(['bill_id'=> $bill_id]);
             $bill = Bill::find($bill_id);
             $customer = $bill->customer;
             $department = $customer->department;
@@ -235,7 +251,15 @@ class BillController extends Controller
     public function vnpayReturn(Request $request) {
         $url = session('url_prev','/');
         if($request->vnp_ResponseCode == "00") {
-            $this->apSer->thanhtoanonline(session('cost_id'));
+            $bill_id = session('bill_id');
+            if ($bill_id) {
+                $bill = Bill::find($bill_id);
+                $bill->paid_date = date('Y-m-d H:i:s');
+                $bill->paid_mode = 'vnpay';
+                $bill->status = 1;
+                $bill->save();
+            }
+            session()->forget('bill_id');
             return redirect($url)->with('success' ,'Đã thanh toán phí dịch vụ');
         }
         session()->forget('url_prev');

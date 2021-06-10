@@ -168,6 +168,8 @@ class CustomerController extends Controller
             $customer_id = $request->customer_id;
             $initial_number = $request->initial_number;
             $final_number = $request->final_number;
+            $from_date = $request->from_date;
+            $to_date = $request->to_date;
             $customer = Customer::find($customer_id);
             $department = $customer->department;
             $bill = BillController::calculate($initial_number, $final_number);
@@ -177,7 +179,9 @@ class CustomerController extends Controller
                 'amount' => $bill['amount'],
                 'price_per_number' => $bill['price_per_number'],
                 'initial_number' => $initial_number,
-                'final_number' => $final_number
+                'final_number' => $final_number,
+                'from_date' => $from_date,
+                'to_date' => $to_date
             ];
 
             return response()->json($data);

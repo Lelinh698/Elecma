@@ -19,12 +19,6 @@ class LoginController extends Controller
             'username' => $request->username,
             'password' => $request->password,
         ];
-//        if ($request->remember == trans('remember.Remember Me')) {
-//            $remember = true;
-//        } else {
-//            $remember = false;
-//        }
-        //kiểm tra trường remember có được chọn hay không
 
         if (Auth::guard('customer')->attempt($arr)) {
             return redirect('/customer');
