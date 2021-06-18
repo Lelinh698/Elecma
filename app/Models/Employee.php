@@ -12,7 +12,7 @@ class Employee extends Authenticatable
     public $timestamps = false;
 
     protected $fillable = [
-        'name', 'email', 'phone', 'address', 'username', 'password', 'department_id'
+        'name', 'email', 'phone', 'username', 'password', 'department_id'
     ];
 
     public function department() {

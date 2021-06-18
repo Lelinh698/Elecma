@@ -4,35 +4,36 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\Department;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class RegisterController extends Controller
 {
     public function getRegister() {
-        return view('auth.registration');
+        $departments = Department::get();
+        return view('auth.registration')->with('departments', $departments);
     }
 
-    protected function validator(array $data)
+    protected function storeUser(Request $request)
     {
-        return Validator::make($data, [
-            'name' => 'required|max:255',
-            'email' => 'required|email|max:255',
-            'username' => 'required|max:16|unique:users',
-            'password' => 'required|min:6|confirmed',
+        $request->validate([
+            'username' => 'required|string|max:255|unique:customers',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:customers',
+            'department' => 'required',
+            'password' => 'required|string|min:8|confirmed',
+            'password_confirmation' => 'required',
         ]);
-    }
 
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param  array  $data
-     * @return Customer
-     */
-    protected function create(array $data)
-    {
-        return Customer::create([
-            'username' => $data['name'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password']),
+        Customer::create([
+            'username' => $request->username,
+            'name' => $request->name,
+            'email' => $request->email,
+            'department_id' => $request->department,
+            'password' => Hash::make($request->password),
         ]);
+
+        return redirect('/customer');
     }
 }

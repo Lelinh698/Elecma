@@ -11,31 +11,22 @@ class StatisticController extends Controller
 {
     public function index() {
         $unpaidData = $this->getUnpaidCustomer();
-        return view('employees.statistic')->with('unpaidData', $unpaidData);
+        $paidData = $this->getPaidCustomer();
+        return view('employees.statistic')->with('unpaidData', $unpaidData)
+                ->with('paidData', $paidData);
     }
 
     public function getUnpaidCustomer() {
         if(Auth::guard('employee')->check()) {
             $data = [];
-            $bills = Bill::where('status', Bill::UNPAID)->get();
-            foreach ($bills as $bill) {
-                $customer = Customer::find($bill->customer_id);
-                array_push($data, [
-                    'username' => $customer->username,
-                    'name' => $customer->name,
-                    'phone' => $customer->phone,
-                    'address' => $customer->address,
-                    'time' => date('m/Y', strtotime($bill->to_date)),
-                    'amount' => $bill->amount,
-                ]);
-            }
-            return $data;
+            $bills = Bill::where('status', Bill::UNPAID)->paginate(5);
+            return $bills;
         }
     }
 
     public function getPaidCustomer() {
         if(Auth::guard('employee')->check()) {
-            $data = Bill::where('status', Bill::PAID)->all();
+            $data = Bill::where('status', Bill::PAID)->get();
             return $data;
         }
     }

@@ -8,18 +8,6 @@
 @section('content')
     <div class="row">
         <div class="col-sm-8 offset-sm-2">
-{{--            <h1 class="display-3">Update information</h1>--}}
-
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-                <br />
-            @endif
             <div class="card" id="update-number">
                 <div class="card-header border-0">Cập nhật chỉ số</div>
                 <div class="card-body">
@@ -33,9 +21,9 @@
                         </div>
                         <div class="form-group row">
                             <label for="initial-number" class="col-sm-2 control-label">Số điện đầu</label>
-                            <input id="initial-number" name="initial-number" type="number" min="0" required class="col-sm-4">
+                            <input id="initial-number" name="initial-number" type="number" min="0" max="9999" required class="col-sm-4">
                             <label for="final-number" class="col-sm-2 control-label">Số điện cuối</label>
-                            <input id="final-number" name="final-number" type="number" min="0" required class="col-sm-4">
+                            <input id="final-number" name="final-number" type="number" min="0"  max="9999" required class="col-sm-4">
                         </div>
                         <div class="form-group row">
                             <label for="from_date" class="col-sm-2 control-label">Từ ngày</label>
@@ -57,11 +45,19 @@
 
 @section('js')
     <script src="{{ asset('js/select2.full.min.js') }}"></script>
+    <script type="text/javascript" src="{!! url('js/sweetalert2.all.js') !!}"></script>
     <script>
         $(document).ready(function() {
             $('.select2').select2({
 
             });
+
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 5000
+            })
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -106,51 +102,78 @@
                 var customer_id = $('#customer').val();
                 var initial_number = $('#initial-number').val()
                 var final_number = $('#final-number').val()
-                console.log(customer_id + " " + initial_number + " " + final_number)
-                if (customer_id) {
-                    $.ajax({
-                        url: '/get_customer_info',
-                        dataType: 'json',
-                        // type: "POST",
-                        data: {
-                            'customer_id': customer_id,
-                            'initial_number': initial_number,
-                            'final_number': final_number,
-                            'from_date': $('#from_date').val(),
-                            'to_date': $('#to_date').val()
-                        },
-                        success: function(data) {
-                            date = new Date().toJSON().slice(0,10).replace(/-/g,'/');
-                            console.log(data['bill']['amount'])
-                            $('#bill').append(`@include('bill.bill')`)
-                            $('#confirm').click(function (e) {
-                                e.preventDefault()
+                if (!initial_number || !final_number || !$('#from_date').val() || !$('#to_date').val())
+                {
+                    Toast.fire({
+                        icon: 'warning',
+                        title: "Hãy điền tất cả các trường!"
+                    })
+                }
+                else 
+                {
+                    if (final_number <= initial_number) {
+                        Toast.fire({
+                            icon: 'warning',
+                            title: "Số điện cuối phải lớn hơn số điện đầu!"
+                        })
+                    }
+                    else if ($('#from_date').val() >= $('#to_date').val()){
+                        Toast.fire({
+                            icon: 'warning',
+                            title: "Ngày cuối phải lớn hơn ngày đầu!"
+                        })
+                    } 
+                    else
+                    {
+                        if (customer_id) {
+                            $.ajax({
+                                url: '/get_customer_info',
+                                dataType: 'json',
+                                // type: "POST",
+                                data: {
+                                    'customer_id': customer_id,
+                                    'initial_number': initial_number,
+                                    'final_number': final_number,
+                                    'from_date': $('#from_date').val(),
+                                    'to_date': $('#to_date').val()
+                                },
+                                success: function(data) {
+                                    date = new Date().toJSON().slice(0,10).replace(/-/g,'/');
+                                    console.log(data['bill']['amount'])
+                                    $('#bill').append(`@include('bill.bill')`)
+                                    $('#confirm').click(function (e) {
+                                        e.preventDefault()
 
-                                var customer_id = $('#customer').val();
-                                var initial_number = $('#initial-number').val()
-                                var final_number = $('#final-number').val()
-                                $.ajax({
-                                    url: '/bill',
-                                    dataType: 'json',
-                                    type: "POST",
-                                    data: {
-                                        "_token": "{{ csrf_token() }}",
-                                        'customer_id': customer_id,
-                                        'initial_number': initial_number,
-                                        'final_number': final_number,
-                                        'from_date': $('#from_date').val(),
-                                        'to_date': $('#to_date').val(),
-                                        'amount': data['bill']['amount'],
-                                        'price_per_number': data['bill']['price_per_number'],
-                                        'status': 0
-                                    },
-                                    success: function(data) {
-                                        alert('Success')
-                                    }
-                                });
-                            })
+                                        var customer_id = $('#customer').val();
+                                        var initial_number = $('#initial-number').val()
+                                        var final_number = $('#final-number').val()
+                                        $.ajax({
+                                            url: '/bill',
+                                            dataType: 'json',
+                                            type: "POST",
+                                            data: {
+                                                "_token": "{{ csrf_token() }}",
+                                                'customer_id': customer_id,
+                                                'initial_number': initial_number,
+                                                'final_number': final_number,
+                                                'from_date': $('#from_date').val(),
+                                                'to_date': $('#to_date').val(),
+                                                'amount': data['bill']['amount'],
+                                                'price_per_number': data['bill']['price_per_number'],
+                                                'status': 0
+                                            },
+                                            success: function(data) {
+                                                Toast.fire({
+                                                    icon: 'success',
+                                                    title: data['status']
+                                                })
+                                            }
+                                        });
+                                    })
+                                }
+                            });
                         }
-                    });
+                    }
                 }
             });
         });

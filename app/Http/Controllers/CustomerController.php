@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class CustomerController extends Controller
 {
@@ -48,35 +49,29 @@ class CustomerController extends Controller
         return view('customer.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $request->validate([
-            'username'=>'required',
-            'password'=>'required',
-            'email'=>'required',
+            'username'=>'required|string',
+            'password' => 'required|string',
+            'name'=>'required',
+            'email'=>'required|string|email',
+            'address'=>'required',
             'phone' => 'required',
-            'address' => 'required'
-
+            'department_id' => 'required'
         ]);
 
-        $id = $request->get('id');
-        $customer = Customer::updateOrCreate(
-            ['id' => $id],
+        $customer = Customer::create(
             [
-                'username'  => $request->get('username'),
-                'password' => Hash::make($request->get('$password')),
+                'username' => $request->get('username'),
+                'password' => Hash::make($request->get('password')),
+                'name' => $request->get('name'),
                 'email' => $request->get('email'),
+                'address'=> $request->get('address'),
                 'phone' => $request->get('phone'),
-                'address' => $request->get('address'),
+                'department_id' => $request->get('department_id'),
             ]);
-
-        return redirect(route('customer.edit', $id));
+        return response()->json($customer);
     }
 
     public function show(Customer $customer)
@@ -87,38 +82,73 @@ class CustomerController extends Controller
     public function edit($id)
     {
         $customer = Customer::find($id);
-
-        return  view('customers.edit', compact('customer'));
+        if (Auth::guard('customer')->check()) {
+            return  view('customers.edit', compact('customer'));
+        }
+        elseif (Auth::guard('admin')->check()) {
+           return response()->json($customer);
+        }
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'username'=>'required',
-            'email'=>'required',
-            'phone' => 'required',
-            'address' => 'required'
-
-        ]);
-
-        $customer = Customer::updateOrCreate(
-            ['id' => $id],
-            [
-                'username'  => $request->get('username'),
-                'email' => $request->get('email'),
-                'phone' => $request->get('phone'),
-                'address' => $request->get('address'),
+        if (Auth::guard('customer')->check()) {
+            $request->validate([
+                'username'=>'required',
+                'name'=>'required',
+                'email'=>'required',
+                'phone' => 'required',
+                'address' => 'required'
             ]);
 
-        return redirect(route('customer.edit', $id));
+            $customer = Customer::updateOrCreate(
+                ['id' => $id],
+                [
+                    'username'  => $request->get('username'),
+                    'name'  => $request->get('name'),
+                    'email' => $request->get('email'),
+                    'phone' => $request->get('phone'),
+                    'address' => $request->get('address'),
+                ]);
+    
+            return redirect(route('customer.edit', $id));
+        }
+        elseif (Auth::guard('admin')->check()) {
+            $request->validate([
+                'username'=>'required',
+                'password'=>'required',
+                'name'=>'required',
+                'email'=>'required',
+                'phone' => 'required',
+                'address' => 'required',
+                'department_id' => 'required'
+            ]);
+
+            $customer = Customer::updateOrCreate(
+                ['id' => $id],
+                [
+                    'username' => $request->get('username'),
+                    'password' => Hash::make($request->get('password')),
+                    'name' => $request->get('name'),
+                    'email' => $request->get('email'),
+                    'phone' => $request->get('phone'),
+                    'address' => $request->get('address'),
+                    'department_id' => $request->get('department_id'),
+                ]);
+    
+            return response()->json($customer);
+        }
     }
 
     public function destroy($id)
     {
-        $customer = Customer::where('id', '=', $id)->delete();
-
-//        return Response::json($customer);
-        return redirect('/customers')->with('success', 'Customer deleted!');
+        try {
+            $customer = Customer::where('id', '=', $id)->delete();
+            return response()->json(['status' => 'Xoá thành công!']);
+        } 
+        catch (Exception $e){
+            return response()->json(['error' => $e]);
+        }
     }
 
     public function getCustomerListView() {

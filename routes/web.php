@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 //});
 
 
-Route::get('/', 'Auth\LoginController@getLogin');
+Route::get('/', 'Auth\LoginController@getLogin')->name('login');
 Route::post('/', 'Auth\LoginController@postLogin');
 Route::get('/register', 'Auth\RegisterController@getRegister');
 Route::get('/logout', 'Auth\LoginController@getLogout');
@@ -58,3 +58,5 @@ Route::group(['prefix' => 'admin'],function(){
     Route::get('/update_electric_price', 'AdminController@getUpdatePriceForm');
     Route::post('/update_electric_price', 'AdminController@storeElectricPrice');
 });
+
+Route::resource('departments', 'DepartmentController');

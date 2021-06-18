@@ -9,6 +9,8 @@ use App\Models\Meter_reading;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use App\Mail\SendMail;
+use Illuminate\Support\Facades\Mail;
 
 class BillController extends Controller
 {
@@ -58,10 +60,8 @@ class BillController extends Controller
             'status' => 'required'
         ]);
 
-        $id = $request->get('id');
-        $bill = Bill::updateOrCreate(
-            ['id' => $id],
-            [
+        try {
+            $newBill = Bill::create([
                 'customer_id'  => $customer_id,
                 'initial_number' => $initial_number,
                 'final_number' => $final_number,
@@ -71,14 +71,27 @@ class BillController extends Controller
                 'to_date' => $to_date,
                 'status' => $status,
             ]);
-        Meter_reading::create([
-            'meter_id' => Customer::find($customer_id)->meter->id,
-            'number' => $final_number - $initial_number,
-            'month' => date('m', $to_date),
-            'year' => date('Y', $to_date),
-        ]);
-
-        return redirect()->route('update_electric_number', ['status' => 'Cập nhật thành công']);
+    
+            Meter_reading::create([
+                'meter_id' => Customer::find($customer_id)->meter->id,
+                'number' => $final_number - $initial_number,
+                'month' => date('m', strtotime($from_date)),
+                'year' => date('Y', strtotime($from_date)),
+            ]);
+    
+            $bill = Bill::find($newBill->id);
+            $customer = $bill->customer;
+            $department = $customer->department;
+            $data['department'] = $department;
+            $data['customer'] = $customer;
+            $data['bill'] = $bill;
+            $data['date'] = date('d-m-Y');
+            
+            Mail::to($customer->email)->send(new SendMail($data));
+            return response()->json(['status' => 'Cập nhật thành công']);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e]);
+        }
     }
 
     /**
@@ -179,7 +192,7 @@ class BillController extends Controller
     }
 
     public function getBillInfo(Request $request) {
-        if (Auth::guard('customer')->check()) {
+        if (Auth::guard('customer')->check() || Auth::guard('employee')->check()) {
             $bill_id = $request->bill_id;
             session(['bill_id'=> $bill_id]);
             $bill = Bill::find($bill_id);

@@ -12,27 +12,26 @@
     <!-- info row -->
     <div class="row invoice-info">
         <div class="col-sm-4 invoice-col">
-            From
+            Từ
             <address>
                 <strong>${data['department']['name']}</strong><br>
-                ${data['department']['address']}<br>
+                <b>Địa chỉ:</b> ${data['department']['address']}<br>
 {{--                Phone: (804) 123-5432<br>--}}
-{{--                Email: info@almasaeedstudio.com--}}
             </address>
         </div>
         <!-- /.col -->
         <div class="col-sm-4 invoice-col">
-            To
+            Tới
             <address>
                 <strong>${data['customer']['name']}</strong><br>
                 ${data['customer']['address']}<br>
-                Phone: ${data['customer']['phone']}<br>
-                Email: ${data['customer']['email']}
+                <b>Số điện thoại:</b> ${data['customer']['phone']}<br>
+                <b>Email:</b> ${data['customer']['email']}
             </address>
         </div>
         <!-- /.col -->
         <div class="col-sm-4 invoice-col">
-            <b>Bill ID #007612</b><br>
+            <!-- <b>Bill ID ${data['bill']['id']}</b><br> -->
             <br>
 {{--            <b>Payment Due:</b> 2/22/2014<br>--}}
             <b>Account:</b> ${data['customer']['username']}
@@ -41,23 +40,7 @@
     </div>
     <!-- /.row -->
     <div class="row">
-{{--    @auth('customer')--}}
-{{--        <div class="col-6" id="payment-method">--}}
-{{--            <p class="lead">Payment Methods:</p>--}}
-{{--            <img id="visa" src="{{ asset('images/credit/visa.png') }}" alt="Visa">--}}
-{{--            <img src="{{ asset('images/credit/mastercard.png') }}" alt="Mastercard">--}}
-{{--            <img src="{{ asset('images/credit/american-express.png') }}" alt="American Express">--}}
-{{--            <img src="{{ asset('images/credit/paypal2.png') }}" alt="Paypal">--}}
-{{--            <img id="vnpay" src="{{ asset('images/credit/vnpay2.jpg') }}" alt="Vnpay">--}}
-{{--            <div id="payment" style="margin-top: 2px;">--}}
-
-{{--            </div>--}}
-{{--        </div>--}}
-{{--        <div class="col-6">--}}
-{{--    @endauth--}}
-{{--    @auth('employee')--}}
-    <div class="col-12">
-{{--    @endauth--}}
+        <div class="col-12">
             <div class="table-responsive">
                 <table class="table">
                     <tbody>

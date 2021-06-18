@@ -15,6 +15,11 @@ class LoginController extends Controller
 
     public function postLogin(Request $request)
     {
+        $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
         $arr = [
             'username' => $request->username,
             'password' => $request->password,
@@ -27,7 +32,7 @@ class LoginController extends Controller
         } elseif (Auth::guard('admin')->attempt($arr)) {
             return redirect('/admin');
         } else {
-            return redirect()->back()->with('status', 'Email hoặc Password không chính xác');
+            return redirect(route('login'))->with('error', 'Username hoặc Password không chính xác');
         }
     }
 

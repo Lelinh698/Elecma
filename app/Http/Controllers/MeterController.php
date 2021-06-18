@@ -14,7 +14,7 @@ class MeterController extends Controller
     public function get_current_year_number($customer_id) {
         $current_year = date('Y', time());
         $customer = Customer::find($customer_id);
-        $meter = $customer->meter->find(1);
+        $meter = $customer->meter;
         $list_number = $meter->meter_reading->where('year', '=', $current_year)->pluck(['number']);
         return view('customers.number_list')->with('year', $current_year)->with('numbers', json_encode($list_number, JSON_NUMERIC_CHECK));
     }
@@ -174,7 +174,7 @@ class MeterController extends Controller
         $data3 = $this->address_cal();
 //        var_dump($data1['year_2020']);
 //        var_dump($data2['year_2020']);
-//        var_dump($data3['year_2020']);
+    //    var_dump($data3);
         $result = array_merge_recursive($data1, $data2, $data3);
 //        var_dump($result);
 
@@ -226,16 +226,32 @@ class MeterController extends Controller
         $data = [];
         $department_id = Auth::guard('employee')->user()->department_id;
         $customers = Customer::where('department_id', $department_id)->get();
-        $average_group = [];
+        $group_tendency = [];
         foreach ($customers as $customer) {
             $meter = Meter::where('customer_id', $customer->id)->first();
             if (!empty($meter)) {
                 $latest_twelve_month = $meter->meter_reading->take(-12);
                 foreach($latest_twelve_month->pluck('month') as $month) {
                     $customer_data = $latest_twelve_month->where('month', $month)->first();
-                    $group_average = Meter_reading::where('year', $customer_data->year)->where('month', $month)->avg('number');
-                    $data['month_'.$month]['id_'.$customer->id]['group'] = $customer_data->number/$group_average;
+                    if ($month != 1) {
+                        $previous_month_data = Meter_reading::where('year', $customer_data->year)
+                            ->where('month', $month-1)->first()->number;
+                    } else
+                    {
+                        $previous_month_data = Meter_reading::where('year', $customer_data->year - 1)
+                            ->where('month', 12)->first()->number;
+                    }
+                    // $group_average = Meter_reading::where('year', $customer_data->year)->where('month', $month)->avg('number');
+                    $customer_tendency = $customer_data->number/$previous_month_data;
+                    $group_tendency['month_'.$month]['id_'.$customer->id] = $customer_tendency;
+                    // $data['month_'.$month]['id_'.$customer->id]['group'] = $customer_data->number/$group_average;
                 }
+            }
+        }
+        foreach($group_tendency as $month => $value) {
+            $group_average = array_sum($group_tendency[$month])/count($group_tendency[$month]);
+            foreach ($group_tendency[$month] as $customer => $item) {
+                $data[$month][$customer]['group'] = $item/$group_average;
             }
         }
         return $data;

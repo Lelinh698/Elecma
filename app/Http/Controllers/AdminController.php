@@ -9,41 +9,56 @@ use App\Models\Electricity_price;
 use App\Models\Employee;
 use App\Models\Meter_reading;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
     public function index() {
-        $customers = Customer::all()->count();
-        $employees = Employee::all()->count();
-        $departments = Department::all()->count();
-        $bills = Bill::all()->count();
-        return view('admin.index')->with('customers',$customers)->with('employees', $employees)
-            ->with('departments', $departments)->with('bills', $bills);
+        if (Auth::guard('admin')->check()) {
+            $customers = Customer::all()->count();
+            $employees = Employee::all()->count();
+            $departments = Department::all()->count();
+            $bills = Bill::all()->count();
+            return view('admin.index')->with('customers',$customers)->with('employees', $employees)
+                ->with('departments', $departments)->with('bills', $bills);
+        }
     }
 
     public function getCustomer() {
-        $customers = Customer::get();
-        return view('admin.customer')->with('customers',$customers);
+        if (Auth::guard('admin')->check()) {
+            $customers = Customer::paginate(5);
+            $departments = Department::get();
+            return view('admin.customer')->with('customers',$customers)->with('departments', $departments);
+        }
     }
 
     public function getEmployee() {
-        $employees = Employee::get();
-        return view('admin.employee')->with('employees',$employees);
+        if (Auth::guard('admin')->check()) {
+            $employees = Employee::paginate(5);
+            $departments = Department::get();
+            return view('admin.employee')->with('employees',$employees)->with('departments', $departments);
+        }
     }
 
     public function getDepartment() {
-        $departments = Department::get();
-        return view('admin.department')->with('departments',$departments);
+        if (Auth::guard('admin')->check()) {
+            $departments = Department::paginate(5);
+            return view('admin.department')->with('departments',$departments);
+        }
     }
 
     public function getBill() {
-        $bills = Bill::get();
-        return view('admin.bill')->with('bills',$bills);
+        if (Auth::guard('admin')->check()) {
+            $bills = Bill::get();
+            return view('admin.bill')->with('bills',$bills);
+        }
     }
 
     public function getUpdatePriceForm(){
-        $price = Electricity_price::get();
-        return view('admin.update_electric_price')->with('price', $price);
+        if (Auth::guard('admin')->check()) {
+            $price = Electricity_price::get();
+            return view('admin.update_electric_price')->with('price', $price);
+        }
     }
 
     public function storeElectricPrice(Request $request) {

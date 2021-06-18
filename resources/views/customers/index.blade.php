@@ -7,13 +7,13 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header border-0">
-                <h3 class="card-title">Department information</h3>
+                <h3 class="card-title">Thông tin chi nhánh điện</h3>
             </div>
             <div class="card-body">
                 <dl class="row">
-                    <dt class="col-sm-6">Deaprtment name</dt>
+                    <dt class="col-sm-6">Tên chi nhánh</dt>
                     <dd class="col-sm-6">{{ $department->name }}</dd>
-                    <dt class="col-sm-6">Adress</dt>
+                    <dt class="col-sm-6">Địa chỉ</dt>
                     <dd class="col-sm-6">{{ $department->address }}</dd>
                 </dl>
             </div>
@@ -21,17 +21,19 @@
         </div>
         <div class="card">
             <div class="card-header border-0">
-                <h3 class="card-title">Customer information</h3>
+                <h3 class="card-title">Thông tin khách hàng</h3>
             </div>
             <div class="card-body">
                 <dl class="row">
-                    <dt class="col-sm-6">Username</dt>
+                    <dt class="col-sm-6">Tên đăng nhập</dt>
                     <dd class="col-sm-6">{{ $customer->username }}</dd>
+                    <dt class="col-sm-6">Họ tên</dt>
+                    <dd class="col-sm-6">{{ $customer->name }}</dd>
                     <dt class="col-sm-6">Email</dt>
                     <dd class="col-sm-6">{{ $customer->email }}</dd>
-                    <dt class="col-sm-6">Phone</dt>
+                    <dt class="col-sm-6">Điện thoại</dt>
                     <dd class="col-sm-6">{{ $customer->phone }}</dd>
-                    <dt class="col-sm-6">Address</dt>
+                    <dt class="col-sm-6">Địa chỉ</dt>
                     <dd class="col-sm-6">{{ $customer->address }}</dd>
                 </dl>
             </div>
@@ -39,7 +41,7 @@
         </div>
         <div class="card">
             <div class="card-header border-0">
-                <h3 class="card-title">Bill information</h3>
+                <h3 class="card-title">Thông tin hóa đơn</h3>
             </div>
             <div class="card-body">
                 <form>
@@ -97,7 +99,7 @@
                             <td>{{$bill['amount']}}₫</td>
                             <td>{{$bill['status']}}</td>
                             <td>
-                                <button class="bill btn btn-info" bill_id="{{$bill['id']}}">Xem hoa don</button>
+                                <button class="bill btn btn-info" bill_id="{{$bill['id']}}">Xem hóa đơn</button>
                             </td>
                         </tr>
                         @endforeach
