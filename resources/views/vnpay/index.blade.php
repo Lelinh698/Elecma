@@ -71,8 +71,8 @@
                 </select>
             </div>
 
-            <button type="submit" class="btn btn-primary" id="btnPopup">Thanh toán Popup</button>
-            <button type="submit" class="btn btn-default">Thanh toán Redirect</button>
+            <!-- <button type="submit" class="btn btn-primary" id="btnPopup">Thanh toán Popup</button> -->
+            <button type="submit" class="btn btn-default">Thanh toán</button>
 
         </form>
     </div>

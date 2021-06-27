@@ -93,14 +93,14 @@
                     labels  : label,
                     datasets: [
                         {
-                            backgroundColor: '#007bff',
-                            borderColor    : '#007bff',
-                            data           : current_data['number']
-                        },
-                        {
                             backgroundColor: '#ced4da',
                             borderColor    : '#ced4da',
                             data           : previous_data['number']
+                        },
+                        {
+                            backgroundColor: '#007bff',
+                            borderColor    : '#007bff',
+                            data           : current_data['number']
                         }
                     ]
                 },
